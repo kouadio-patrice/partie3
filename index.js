@@ -1,9 +1,27 @@
 //const url = require('url')
+const { response } = require('express')
 const express = require('express')
 //const { json } = require('express')
 const app = express()
+app.use(express.json())
 
-let persons = [
+const requestLogger = (request, response, next) => {
+  console.log('Method:', request.method)
+  console.log('Path:  ', request.path)
+  console.log('Body:  ', request.body)
+  console.log('---')
+  next()
+}
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+
+
+app.use(requestLogger)
+
+
+const persons = [
         { 
           "name": "Arto Hellas", 
           "number": "040-123456",
@@ -42,6 +60,50 @@ let persons = [
       }
        
     })
+
+    app.delete('/api/persons/:id', (request, response) => {
+      const id = Number(request.params.id)
+      persons = persons.filter(person => person.id !== id)
+      response.status(204).end()
+      console.log('reponse',response)
+    })
+  
+    const generaleId =  () => {
+    const maxId = persons.length > 0
+     ? Math.random(...persons.map(n => n.id))
+     :0
+     return maxId +1
+    }
+  console.log('general', generaleId())
+
+    app.post('/api/persons', (request, response) => {
+      const person = request.body
+
+      console.log('person',person)
+
+      if(!body.name){
+        return response.status(400).json({
+          error: 'name missing'
+        })
+       }
+       if(!body.number){
+        return response.status(400).json({
+          error: 'number missing'
+        })
+       }
+
+       const pers = {
+         name : body.name,
+         number:body.number,
+         id: generaleId()
+       }
+       console.log('pers',pers)
+       persons = persons.concat(pers)
+       response.json(pers)
+       
+    })
+    
+    app.use(unknownEndpoint)
      const PORT = 3001
      app.listen(PORT,() => {
          console.log(`server runing on port ${PORT}`)
