@@ -43,10 +43,49 @@ const persons = [
           "id": 4
         }
       ]
+
       app.get('/',(request,response) => {
         response.send('<h1> Hello Word !</h1>')
     })
-  
+
+    app.get('/api/persons', (request, response) => {
+        response.json(persons)
+        })
+
+   
+    const generaleId =  () => {
+    const maxId = persons.length > 0
+     ? Math.random(...persons.map(n => n.id))
+     :0
+     return maxId +1
+    }
+
+  console.log('general', generaleId())
+
+
+    app.post('/api/persons', (request, response) => {
+      const body = request.body
+
+      console.log('person',person)
+
+      if((!body.name) && (!body.number)) {
+        return response.status(400).json({
+          error: 'name  or number missing '
+        })
+       }
+       
+       const person = {
+         name : body.name,
+         number:body.number,
+         id: generaleId()
+       }
+       
+       persons = persons.concat(person)
+       response.json(person)
+    })
+    console.log('pers',persons)
+
+
 
     app.get('/api/persons/:id', (request , response) => {
       const id = Number(request.params.id)
@@ -65,45 +104,11 @@ const persons = [
       const id = Number(request.params.id)
       persons = persons.filter(person => person.id !== id)
       response.status(204).end()
-      console.log('reponse',response)
     })
   
-    const generaleId =  () => {
-    const maxId = persons.length > 0
-     ? Math.random(...persons.map(n => n.id))
-     :0
-     return maxId +1
-    }
-  console.log('general', generaleId())
-
-    app.post('/api/persons', (request, response) => {
-      const person = request.body
-
-      console.log('person',person)
-
-      if(!body.name){
-        return response.status(400).json({
-          error: 'name missing'
-        })
-       }
-       if(!body.number){
-        return response.status(400).json({
-          error: 'number missing'
-        })
-       }
-
-       const pers = {
-         name : body.name,
-         number:body.number,
-         id: generaleId()
-       }
-       console.log('pers',pers)
-       persons = persons.concat(pers)
-       response.json(pers)
-       
-    })
-    
+    console.log('reponse',response)
     app.use(unknownEndpoint)
+
      const PORT = 3001
      app.listen(PORT,() => {
          console.log(`server runing on port ${PORT}`)
