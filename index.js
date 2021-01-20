@@ -108,7 +108,7 @@ const persons = [
       response.status(204).end()
     })
   
-    console.log('reponse',response)
+    
     app.use(unknownEndpoint)
 
      const PORT = process.env.PORT || 3001
